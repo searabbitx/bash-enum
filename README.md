@@ -58,11 +58,12 @@ Usage: ./dns.sh [options] domains_file
 
 OPTIONS:
   -s, --server       dns server to use
+  -v, --verbose      show dns responses
   -t, --threads      number of concurrent processes (default: 0)
                      set to '0' to tell xargs to run as many processes as possible at a time
                      (this is used as xargs -P option)
   -h, --help         print this help message and exit
 
 EXAMPLE:
-  ./dns.sh -t 5 -s 10.10.10.11 ./domains.txt
+  ./dns.sh -v -t 5 -s 10.10.10.11 ./domains.txt
 ```

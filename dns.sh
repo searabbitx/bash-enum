@@ -5,23 +5,29 @@ function usage() {
   echo ""
   echo "OPTIONS:"
   echo "  -s, --server       dns server to use"
+  echo "  -v, --verbose      show dns responses"
   echo "  -t, --threads      number of concurrent processes (default: 0)"
   echo "                     set to '0' to tell xargs to run as many processes as possible at a time"
   echo "                     (this is used as xargs -P option)"
   echo "  -h, --help         print this help message and exit"
   echo ""
   echo "EXAMPLE:"
-  echo "  ./dns.sh -t 5 -s 10.10.10.11 ./domains.txt"
+  echo "  ./dns.sh -v -t 5 -s 10.10.10.11 ./domains.txt"
 }
 
 POSITIONAL_ARGS=()
 THREADS=0
+VERBOSE=0
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     -s|--server)
       DNSSERVER="$2"
       shift
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=1
       shift
       ;;
     -t|--threads)
@@ -73,7 +79,7 @@ fi
 
 # logging helper
 function info() {
-  echo "[+] $@"
+  echo "[+] $1"
 }
 export -f info
 
@@ -86,16 +92,21 @@ function test_dom() {
   fi
 
   result=$(eval $cmd)
-
   if [ -z "$result" ]; then
     :;
   else
-     info "Found $1" 
+    ADDIT=""
+    if [ "1" == "$VERBOSE" ]; then
+      ADDIT=$(echo "$result" | while read line; do echo " |  $line"; done)
+      ADDIT="
+$ADDIT" 
+    fi
+    info "Found $1$ADDIT" 
   fi
 }
 export -f test_dom
 
 
-cat $DOMAINS_FILE | DNSSERVER=$DNSSERVER xargs -n 1 -P $THREADS -I {} bash -c 'test_dom "$@"' _ {}
+cat $DOMAINS_FILE | DNSSERVER=$DNSSERVER VERBOSE=$VERBOSE xargs -n 1 -P $THREADS -I {} bash -c 'test_dom "$@"' _ {}
 
 info "Done"
