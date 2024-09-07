@@ -12,7 +12,7 @@ function usage() {
   echo "  -h, --help         print this help message and exit"
   echo ""
   echo "EXAMPLE:"
-  echo "  ./tcptest_port.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306' \\"
+  echo "  ./tcptest_port.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'"
 }
 
 POSITIONAL_ARGS=()
@@ -64,7 +64,7 @@ function info() {
 }
 export -f info
 
-# the function that tests a single subdomain
+# the function that tests a single port
 function test_port {
   if nc -nv -w $TIMEOUT -z $IP $1 2>&1 | grep -E 'open|succeeded' >/dev/null; then
     info "Port $1 open"
