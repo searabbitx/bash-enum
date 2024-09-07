@@ -48,3 +48,21 @@ OPTIONS:
 EXAMPLE:
   ./tcpscan.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'
 ```
+
+### `dns.sh`
+
+resolve a list of domains (uses `dig` and `xargs`)
+
+```
+Usage: ./dns.sh [options] domains_file
+
+OPTIONS:
+  -s, --server       dns server to use
+  -t, --threads      number of concurrent processes (default: 0)
+                     set to '0' to tell xargs to run as many processes as possible at a time
+                     (this is used as xargs -P option)
+  -h, --help         print this help message and exit
+
+EXAMPLE:
+  ./dns.sh -t 5 -s 10.10.10.11 ./domains.txt
+```
