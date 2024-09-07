@@ -7,19 +7,21 @@ function usage() {
   echo "  -d, --domain       root domain"
   echo "  -w, --wordlist     wordlist file with subdomains"
   echo "  -f, --filter-text  text present in response of invalid subdomains"
-  echo "  -t, --threads      number of concurrent processes (default: 10)"
-  echo "                     (this is used as xargs -P option)"
+  echo "  -t, --threads      number of concurrent processes (default: 0)"
   echo "                     set to '0' to tell xargs to run as many processes as possible at a time"
+  echo "                     (this is used as xargs -P option)"
+  echo "  --curl-opts        additional arguments to pass to curl"
   echo "  -h, --help         print this help message and exit"
   echo ""
   echo "EXAMPLE:"
   echo "  ./vhosts.sh -t 5 -w ./subdomains.txt \\"
   echo "      -d example.com -f 'Example Domain' \\"
+  echo "      --curl-opts '--user-agent SomeAgent -H \"X-Auth: foo\"' \\"
   echo "      http://example.com"
 }
 
 POSITIONAL_ARGS=()
-THREADS=10
+THREADS=0
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -40,6 +42,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     -t|--threads)
       THREADS="$2"
+      shift
+      shift
+      ;;
+    --curl-opts)
+      CURL_OPTS="$2"
       shift
       shift
       ;;
@@ -84,7 +91,7 @@ export -f info
 
 # the function that tests a single subdomain
 function test_sub() {
-  if curl -H "Host: $1.$DOMAIN" $HOST 2>/dev/null | grep "$FILTERTEXT" >/dev/null; then
+  if eval "curl $CURL_OPTS -H 'Host: $1.$DOMAIN' $HOST 2>/dev/null" | grep "$FILTERTEXT" >/dev/null; then
     :;
   else
      info "Found $1.$DOMAIN" 
@@ -93,16 +100,17 @@ function test_sub() {
 export -f test_sub
 
 # test connection
-if curl --parallel -H "Host: $DOMAIN" $HOST 2>/dev/null 1>/dev/null; then
+probe_cmd="curl $CURL_OPTS -H 'Host: $1.$DOMAIN' $HOST"
+if eval "$probe_cmd 2>/dev/null 1>/dev/null"; then
   info "Successfully connected to $DOMAIN at $HOST"
   info "Bruteforcing $DOMAIN with wordlist $WORDLIST and $THREADS threads..."
 else
   echo "Error! Could not connect to $HOST"
   echo ""
   echo "to see what happened try: "
-  echo "    curl -H \"Host: $DOMAIN\" $HOST 2>/dev/null"
+  echo "    $probe_cmd"
   echo ""
   exit 1
 fi
 
-cat $WORDLIST | DOMAIN=$DOMAIN HOST=$HOST FILTERTEXT=$FILTERTEXT xargs -n 1 -P $THREADS -I {} bash -c 'test_sub "$@"' _ {}
+cat $WORDLIST | DOMAIN=$DOMAIN HOST=$HOST FILTERTEXT=$FILTERTEXT CURL_OPTS=$CURL_OPTS xargs -n 1 -P $THREADS -I {} bash -c 'test_sub "$@"' _ {}
