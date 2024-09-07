@@ -114,3 +114,5 @@ else
 fi
 
 cat $WORDLIST | DOMAIN=$DOMAIN HOST=$HOST FILTERTEXT=$FILTERTEXT CURL_OPTS=$CURL_OPTS xargs -n 1 -P $THREADS -I {} bash -c 'test_sub "$@"' _ {}
+
+info "Done"
