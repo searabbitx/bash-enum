@@ -35,7 +35,7 @@ EXAMPLE:
 tcp port scan (uses `nc` and `xargs`)
 
 ```
-Usage: ./tcptest_port.sh [options] ip ports
+Usage: ./tcpscan.sh [options] ip ports
 
 OPTIONS:
   -t, --threads      number of concurrent processes (default: 0)
@@ -46,5 +46,5 @@ OPTIONS:
   -h, --help         print this help message and exit
 
 EXAMPLE:
-  ./tcptest_port.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'
+  ./tcpscan.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'
 ```

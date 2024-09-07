@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage() {
-  echo "Usage: ./tcptest_port.sh [options] ip ports"
+  echo "Usage: ./tcpscan.sh [options] ip ports"
   echo ""
   echo "OPTIONS:"
   echo "  -t, --threads      number of concurrent processes (default: 0)"
@@ -12,7 +12,7 @@ function usage() {
   echo "  -h, --help         print this help message and exit"
   echo ""
   echo "EXAMPLE:"
-  echo "  ./tcptest_port.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'"
+  echo "  ./tcpscan.sh -t 5 -w 2 10.10.10.10 '21-25,80,8000-9000,3306'"
 }
 
 POSITIONAL_ARGS=()
