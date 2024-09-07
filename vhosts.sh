@@ -81,6 +81,13 @@ if [ "${#POSITIONAL_ARGS[@]}" != "1" ]; then
   exit 1
 fi
 
+if [ -z "$WORDLIST" ]; then
+  echo "Please pick a wordlist (-w,--wordlist)"
+  echo ""
+  usage
+  exit 1
+fi
+
 HOST=${POSITIONAL_ARGS[0]}
 
 # logging helper
